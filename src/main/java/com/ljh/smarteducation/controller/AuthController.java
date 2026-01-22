@@ -6,6 +6,7 @@ import com.ljh.smarteducation.dto.LoginRequest;
 import com.ljh.smarteducation.entity.User;
 import com.ljh.smarteducation.repository.UserRepository;
 import com.ljh.smarteducation.service.UserService;
+import com.ljh.smarteducation.util.InputValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -14,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.Optional;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -35,6 +37,18 @@ public class AuthController {
      */
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody LoginRequest registerRequest) {
+        // 输入验证：验证用户名格式
+        if (!InputValidator.isValidUsername(registerRequest.getUsername())) {
+            return ResponseEntity.badRequest()
+                .body(Map.of("error", "用户名格式不正确", "code", "INVALID_USERNAME"));
+        }
+        
+        // 输入验证：验证密码格式
+        if (!InputValidator.isValidPassword(registerRequest.getPassword())) {
+            return ResponseEntity.badRequest()
+                .body(Map.of("error", "密码格式不正确", "code", "INVALID_PASSWORD"));
+        }
+        
         // 检查用户名是否已存在
         if (userService.findByUsername(registerRequest.getUsername()).isPresent()) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Error: Username is already taken!");
@@ -64,6 +78,12 @@ public class AuthController {
         }
         System.out.println(">>> 登录请求: username=" + loginRequest.getUsername());
         System.out.println(">>> 登录请求: password=" + (loginRequest.getPassword() != null ? "***" : "null"));
+        
+        // 输入验证：验证用户名格式
+        if (!InputValidator.isValidUsername(loginRequest.getUsername())) {
+            return ResponseEntity.badRequest()
+                .body(Map.of("error", "用户名格式不正确", "code", "INVALID_USERNAME"));
+        }
         
         // 1. 从数据库查找用户
         Optional<User> userOptional = userService.findByUsername(loginRequest.getUsername());

@@ -43,6 +43,15 @@ public class Question {
     @Column(name = "sequence_number")
     private Integer sequenceNumber;
 
+    /**
+     * 题目验证状态
+     * PENDING: 待验证
+     * VALIDATED: 已验证通过
+     * REJECTED: 验证未通过
+     */
+    @Column(name = "validation_status", nullable = false)
+    private String validationStatus = "PENDING";
+
     // --- ↑↑↑ (新增结束) ↑↑↑ ---
 
     @CreationTimestamp

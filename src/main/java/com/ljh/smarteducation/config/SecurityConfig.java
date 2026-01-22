@@ -64,12 +64,17 @@ public class SecurityConfig {
                         // 1. 允许公开访问的路径
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/files/**").permitAll()
+                        .requestMatchers("/api/admin/generate-word").permitAll() // Word文档生成接口允许公开访问
                         .requestMatchers(HttpMethod.OPTIONS).permitAll()
 
-                        // 2. (临时修改) 允许所有已认证用户访问练习API，用于调试
+                        // 2. 允许未认证访问获取套题列表和套题详情（公开信息）
+                        .requestMatchers(HttpMethod.GET, "/api/practice/sets").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/practice/set/**").permitAll()
+                        
+                        // 3. 提交答案等操作需要认证
                         .requestMatchers("/api/practice/**").authenticated()
                         
-                        // 3. 其他所有请求都需要认证 (主要针对 admin)
+                        // 4. 其他所有请求都需要认证 (主要针对 admin)
                         .anyRequest().authenticated()
                 );
 
